@@ -1,285 +1,127 @@
-// function saveUsers(users) {
-//     localStorage.setItem("users", JSON.stringify(users));
-// }
+class TodoList {
+    constructor() {
+        this.tasks = this.getTasks();
+        this.taskListElement = document.getElementById("taskList");
+        this.addModal = document.getElementById("addModal");
+        this.addTaskButton = document.getElementById("addTaskButton");
+        this.saveTaskButton = document.getElementById("saveTaskButton");
+        this.closeModalButton = document.getElementById("closeModalButton");
+        this.taskNameInput = document.getElementById("taskName");
+        this.taskYearInput = document.getElementById("taskYear");
+        this.taskStatusInput = document.getElementById("taskStatus");
 
-// function getUsers() {
-//     return JSON.parse(localStorage.getItem("users")) || [];
-// }
+        this.init();
+    }
 
-// let people = getUsers();
-// let parent = document.querySelector(".tbody");
-// let addModal = document.querySelector(".AddModal");
-// let addButton = document.querySelector(".adduser");
-// let searchInput = document.querySelector(".search");
-// let filterActive = document.querySelector(".filter-active");
-// let filterInactive = document.querySelector(".filter-inactive");
+    saveTasks() {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+    }
 
-// function get(arr) {
-//     parent.innerHTML = "";
-//     arr.forEach((person) => {
-//         let tr = document.createElement("tr");
-//         tr.innerHTML = `
-//             <td class="name">${person.name}</td>
-//             <td class="email">${person.email}</td>
-//             <td class="phone">${person.phone}</td>
-//             <td class="city">${person.city ? "Dushanbe" : "Kulob"}</td>
-//             <td class="${person.city ? "Inactive" : "Active"}">${person.city ? "Inactive" : "Active"}</td>
-//             <td>
-//                 <button class="delete">🗑️</button>
-//                 <button class="edit">✏️</button>
-//             </td>
-//         `;
-//         tr.querySelector(".delete").onclick = () => userDelete(person.id);
-//         tr.querySelector(".edit").onclick = () => showEditModal(person);
-//         parent.append(tr);
-//     });
-// }
+    getTasks() {
+        return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
 
-// get(people);
+    renderTasks() {
+        this.taskListElement.innerHTML = "";
+        this.tasks.forEach(task => {
+            let li = document.createElement("li");
+            li.classList.add("task");
 
-// function userDelete(id) {
-//     people = people.filter((person) => person.id !== id);
-//     saveUsers(people);
-//     get(people);
-// }
+            li.innerHTML = `
+                <span class="task-name">${task.name}</span>
+                <span class="task-year">${task.year}</span>
+                <span class="task-status">${task.status}</span>
+                <button class="editButton">Edit</button>
+                <button class="deleteButton">Delete</button>
+                <button class="toggleButton">Check</button>
+            `;
 
-// if (addButton && addModal) {
-//     addButton.onclick = () => {
-//         addModal.innerHTML = `
-//             <h2>Add New User</h2>
-//             <input type="text" id="newName" placeholder="Enter your name">
-//             <input type="email" id="newEmail" placeholder="Enter your email">
-//             <input type="text" id="newPhone" placeholder="Enter your phone">
-//             <select id="newCity">
-//                 <option value="true">Yes</option>
-//                 <option value="false" selected>No</option>
-//             </select>
-//             <button id="saveNewUser">Add</button>
-//             <button id="closeModal">Cancel</button>
-//         `;
-//         addModal.showModal();
+            li.querySelector(".editButton").onclick = () => this.editTask(task.id);
+            li.querySelector(".deleteButton").onclick = () => this.deleteTask(task.id);
+            li.querySelector(".toggleButton").onclick = () => this.toggleComplete(task.id);
 
-//         document.getElementById("saveNewUser").onclick = () => {
-//             let name = document.getElementById("newName").value;
-//             let email = document.getElementById("newEmail").value;
-//             let phone = document.getElementById("newPhone").value;
-//             let city = document.getElementById("newCity").value === "true";
+            this.taskListElement.appendChild(li);
+        });
+    }
 
-//             let newUser = {
-//                 name,
-//                 email,
-//                 phone,
-//                 city,
-//                 status: city ? "Inactive" : "Active",
-//                 id: Date.now().toString(),
-//             };
+    showModal() {
+        this.addModal.style.display = "flex";
+    }
 
-//             people.push(newUser);
-//             saveUsers(people);
-//             get(people);
-//             addModal.close();
-//         };
+    closeModal() {
+        this.addModal.style.display = "none";
+        this.taskNameInput.value = "";
+        this.taskYearInput.value = "";
+        this.taskStatusInput.value = "active";
+    }
 
-//         document.getElementById("closeModal").onclick = () => {
-//             addModal.close();
-//         };
-//     };
-// }
+    addTask() {
+        const taskName = this.taskNameInput.value.trim();
+        const taskYear = this.taskYearInput.value.trim();
+        const taskStatus = this.taskStatusInput.value.trim();
 
-// function showEditModal(person) {
-//     if (!addModal) return;
-//     addModal.innerHTML = `
-//         <h2>Edit User</h2>
-//         <input type="text" id="editName" value="${person.name}">
-//         <input type="email" id="editEmail" value="${person.email}">
-//         <input type="text" id="editPhone" value="${person.phone}">
-//         <select id="editCity">
-//             <option value="true" ${person.city ? "selected" : ""}>Yes</option>
-//             <option value="false" ${!person.city ? "selected" : ""}>No</option>
-//         </select>
-//         <button id="saveEditUser">Save</button>
-//         <button id="closeEditModal">Cancel</button>
-//     `;
-//     addModal.showModal();
+        if (taskName === "" || taskYear === "") {
+            alert("Please enter both task name and year!");
+            return;
+        }
 
-//     document.getElementById("saveEditUser").onclick = () => {
-//         person.name = document.getElementById("editName").value;
-//         person.email = document.getElementById("editEmail").value;
-//         person.phone = document.getElementById("editPhone").value;
-//         person.city = document.getElementById("editCity").value === "true";
-//         person.status = person.city ? "Inactive" : "Active";
-
-//         saveUsers(people);
-//         get(people);
-//         addModal.close();
-//     };
-
-//     document.getElementById("closeEditModal").onclick = () => {
-//         addModal.close();
-//     };
-// }
-
-// if (searchInput) {
-//     searchInput.oninput = (e) => {
-//         const query = e.target.value.toLowerCase();
-//         const results = people.filter((person) => person.name.toLowerCase().includes(query) || person.email.toLowerCase().includes(query) || person.phone.includes(query));
-//         get(results);
-//     };
-// } else {
-//     console.log(error);
-// }
-
-// if (filterActive) {
-//     filterActive.onclick = () => filterByStatus("Active");
-// }
-// if (filterInactive) {
-//     filterInactive.onclick = () => filterByStatus("Inactive");
-// }
-
-// function filterByStatus(status) {
-//     const filtered = people.filter((person) => person.status.toLowerCase() === status.toLowerCase());
-//     get(filtered);
-// }
-
-function saveUsers(users) {
-    sessionStorage.setItem("users", JSON.stringify(users));
-}
-
-function getUsers() {
-    return JSON.parse(sessionStorage.getItem("users")) || [];
-}
-
-let people = getUsers();
-let parent = document.querySelector(".tbody");
-let addModal = document.querySelector(".AddModal");
-let addButton = document.querySelector(".adduser");
-let searchInput = document.querySelector(".search");
-let filterActive = document.querySelector(".filter-active");
-let filterInactive = document.querySelector(".filter-inactive");
-
-function get(arr) {
-    parent.innerHTML = "";
-    arr.forEach((person) => {
-        let tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td class="name">${person.name}</td>
-            <td class="email">${person.email}</td>
-            <td class="phone">${person.phone}</td>
-            <td class="city">${person.city ? "Dushanbe" : "Kulob"}</td>
-            <td class="${person.city ? "Inactive" : "Active"}">${person.city ? "Inactive" : "Active"}</td>
-            <td>
-                <button class="delete">🗑️</button>
-                <button class="edit">✏️</button>
-            </td>
-        `;
-        tr.querySelector(".delete").onclick = () => userDelete(person.id);
-        tr.querySelector(".edit").onclick = () => showEditModal(person);
-        parent.append(tr);
-    });
-}
-
-get(people);
-
-function userDelete(id) {
-    people = people.filter((person) => person.id !== id);
-    saveUsers(people);
-    get(people);
-}
-
-if (addButton && addModal) {
-    addButton.onclick = () => {
-        addModal.innerHTML = `
-            <h2>Add New User</h2>
-            <input type="text" id="newName" placeholder="Enter your name">
-            <input type="email" id="newEmail" placeholder="Enter your email">
-            <input type="text" id="newPhone" placeholder="Enter your phone">
-            <select id="newCity">
-                <option value="true">Yes</option>
-                <option value="false" selected>No</option>
-            </select>
-            <button id="saveNewUser">Add</button>
-            <button id="closeModal">Cancel</button>
-        `;
-        addModal.showModal();
-
-        document.getElementById("saveNewUser").onclick = () => {
-            let name = document.getElementById("newName").value;
-            let email = document.getElementById("newEmail").value;
-            let phone = document.getElementById("newPhone").value;
-            let city = document.getElementById("newCity").value === "true";
-
-            let newUser = {
-                name,
-                email,
-                phone,
-                city,
-                status: city ? "Inactive" : "Active",
-                id: Date.now().toString(),
-            };
-
-            people.push(newUser);
-            saveUsers(people);
-            get(people);
-            addModal.close();
+        const newTask = {
+            id: crypto.randomUUID(),
+            name: taskName,
+            year: taskYear,
+            status: taskStatus,
         };
 
-        document.getElementById("closeModal").onclick = () => {
-            addModal.close();
+        this.tasks.push(newTask);
+        this.saveTasks();
+        this.renderTasks();
+        this.closeModal();
+    }
+
+    editTask(id) {
+        const task = this.tasks.find(task => task.id === id);
+        if (task) {
+            const newTaskName = prompt("Edit Task", task.name);
+            const newTaskYear = prompt("Edit Year", task.year);
+            const newTaskStatus = prompt("Edit Status (active/completed)", task.status);
+
+            if (newTaskName) task.name = newTaskName;
+            if (newTaskYear) task.year = newTaskYear;
+            if (newTaskStatus) task.status = newTaskStatus;
+
+            this.saveTasks();
+            this.renderTasks();
+        }
+    }
+
+    deleteTask(id) {
+        this.tasks = this.tasks.filter(task => task.id !== id);
+        this.saveTasks();
+        this.renderTasks();
+    }
+
+    toggleComplete(id) {
+        const task = this.tasks.find(task => task.id === id);
+        if (task) {
+            task.status = task.status === "active" ? "Inactive" : "active";
+            this.saveTasks();
+            this.renderTasks();
+        }
+    }
+
+    init() {
+        this.renderTasks();
+
+        this.addTaskButton.onclick = () => this.showModal();
+        this.saveTaskButton.onclick = () => this.addTask();
+        this.closeModalButton.onclick = () => this.closeModal();
+
+        window.onclick = (e) => {
+            if (e.target === this.addModal) {
+                this.closeModal();
+            }
         };
-    };
+    }
 }
 
-function showEditModal(person) {
-    if (!addModal) return;
-    addModal.innerHTML = `
-        <h2>Edit User</h2>
-        <input type="text" id="editName" value="${person.name}">
-        <input type="email" id="editEmail" value="${person.email}">
-        <input type="text" id="editPhone" value="${person.phone}">
-        <select id="editCity">
-            <option value="true" ${person.city ? "selected" : ""}>Yes</option>
-            <option value="false" ${!person.city ? "selected" : ""}>No</option>
-        </select>
-        <button id="saveEditUser">Save</button>
-        <button id="closeEditModal">Cancel</button>
-    `;
-    addModal.showModal();
-
-    document.getElementById("saveEditUser").onclick = () => {
-        person.name = document.getElementById("editName").value;
-        person.email = document.getElementById("editEmail").value;
-        person.phone = document.getElementById("editPhone").value;
-        person.city = document.getElementById("editCity").value === "true";
-        person.status = person.city ? "Inactive" : "Active";
-
-        saveUsers(people);
-        get(people);
-        addModal.close();
-    };
-
-    document.getElementById("closeEditModal").onclick = () => {
-        addModal.close();
-    };
-}
-
-if (searchInput) {
-    searchInput.oninput = (e) => {
-        const query = e.target.value.toLowerCase();
-        const results = people.filter((person) => person.name.toLowerCase().includes(query) || person.email.toLowerCase().includes(query) || person.phone.includes(query));
-        get(results);
-    };
-} else {
-    console.log(error);
-}
-
-if (filterActive) {
-    filterActive.onclick = () => filterByStatus("Active");
-}
-if (filterInactive) {
-    filterInactive.onclick = () => filterByStatus("Inactive");
-}
-
-function filterByStatus(status) {
-    const filtered = people.filter((person) => person.status.toLowerCase() === status.toLowerCase());
-    get(filtered);
-}
+new TodoList();

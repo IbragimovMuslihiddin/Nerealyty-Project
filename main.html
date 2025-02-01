@@ -4,27 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To Do List</title>
-    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <div class="start">
-        <button class="adduser">+ ADD NEW USER</button>
-        <input type="text" class="search" placeholder="Search...">
+    <div class="container">
+        <h1>To Do List</h1>
+        <button id="addTaskButton">Add Task</button>
+        <ul id="taskList" class="task-list"></ul>
+
+        <div id="addModal" class="add-modal">
+            <div class="modal-content">
+                <h2>Add New Task</h2>
+                <input type="text" id="taskName" placeholder="Task name" />
+                <input type="number" id="taskYear" placeholder="Year" />
+                <select id="taskStatus">
+                    <option value="active">Active</option>
+                    <option value="completed">Inactive</option>
+                </select>
+                <button id="saveTaskButton">Save</button>
+                <button id="closeModalButton">Cancel</button>
+            </div>
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <td>NAME</td>
-                <td>EMAIL</td>
-                <td>PHONE</td>
-                <td>CITY</td>
-                <td>STATUS</td>
-                <td>ACTIONS</td>
-            </tr>
-        </thead>
-        <tbody class="tbody"></tbody>
-    </table>
-    <dialog class="AddModal"></dialog>
+
     <script src="/program.js"></script>
 </body>
 </html>
+
+
